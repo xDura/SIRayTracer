@@ -1,5 +1,5 @@
 #include "hemisphericalsampler.h"
-#include "matrix4x4.h"
+#include "../core/matrix4x4.h"
 
 #include <random>
 #define _USE_MATH_DEFINES

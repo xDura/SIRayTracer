@@ -33,7 +33,7 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 			return finalColor;
 
 		Vector3D perfSpecDir = Utils::reflect(normal, r.d);
-		Ray rSpec = Ray(closestIntersection.itsPoint, perfSpecDir.normalized(), r.depth + 1);
+		Ray rSpec = Ray(closestIntersection.itsPoint, perfSpecDir.normalized(), r.depth);
 		return computeColor(rSpec, objList, lsList);
 	}
 #pragma endregion
@@ -62,13 +62,13 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		if (!Utils::isTotalInternalReflection(eta, cosThetaI, cosThetaT))
 		{
 			Vector3D transMissionDir = Utils::computeTransmissionDirection(r, normal, eta, cosThetaI, cosThetaT);
-			Ray rTrans = Ray(closestIntersection.itsPoint, transMissionDir.normalized(), r.depth + 1);
+			Ray rTrans = Ray(closestIntersection.itsPoint, transMissionDir.normalized(), r.depth);
 			return computeColor(rTrans, objList, lsList);
 		}
 		else
 		{
 			Vector3D perfSpecDir = Utils::reflect(normal, r.d);
-			Ray rSpec = Ray(closestIntersection.itsPoint, perfSpecDir.normalized(), r.depth + 1);
+			Ray rSpec = Ray(closestIntersection.itsPoint, perfSpecDir.normalized(), r.depth);
 			return computeColor(rSpec, objList, lsList);
 		}
 	}
@@ -103,7 +103,19 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 	#pragma endregion
 
 	#pragma region INDIRECT_ILUMINATION
-	
+
+	//remove this integer and use it as a parameter
+	//on the constructor of globalShader
+	int nSamples = 10;
+	HemisphericalSampler sampler;
+	Vector3D sample;
+	Vector3D Indirect;
+	for (int i = 0; i < nSamples; i++) 
+	{
+		sample = sampler.getSample(normal);
+		Ray indirectRay = Ray(closestIntersection.itsPoint, sample, r.depth);
+	}
+
 	#pragma endregion
 
 	return finalColor;
