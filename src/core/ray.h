@@ -15,7 +15,7 @@ class Ray
 public:
     // Constructors
     Ray();
-    Ray(const Vector3D &ori, const Vector3D &dir,
+    Ray(const Vector3D &ori, Vector3D &dir,
         size_t dep = 0, double start = Epsilon,
         double end = INFINITY);
     // Member functions

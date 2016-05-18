@@ -4,13 +4,15 @@
 Ray::Ray() : minT(0), maxT(INFINITY), depth(0)
 {}
 
-Ray::Ray(const Vector3D &ori, const Vector3D &dir, size_t dep, double start,
+Ray::Ray(const Vector3D &ori, Vector3D &dir, size_t dep, double start,
 	double end)
 	: o(ori), d(dir), minT(start), maxT(end), depth(dep)
 {
+	//in cases of problems with the length we can add this
+	//for the moment I dont use it because this is computatinally slow
+	//as we construct a lot of rays
 	/*if (dir.length() != 1.0)
-		std::cout << "non normalized dir in one ray" << std::endl;
-*/
+		d = dir.normalized();*/
 }
 
 

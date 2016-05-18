@@ -1,6 +1,6 @@
 #include "directishader.h"
 
-DirectIlumination::DirectIlumination(Vector3D bgColor_)
+DirectIlumination::DirectIlumination(Vector3D& bgColor_)
 	:Shader(bgColor_)
 {}
 
@@ -44,10 +44,9 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 			return finalColor;
 		}
 
-		double eta = currentMat.getIndexOfRefraction();
+		double eta = currentMat.getIndexOfRefraction() / 1.0;
 		double cosThetaI = dot(-r.d.normalized(), normal);
 		double cosThetaT = 0.0;
-		//BUG: infinite rays inside the transmission spheres
 		//case Going out of the medium
 		if (cosThetaI < 0.0)
 		{
@@ -60,7 +59,6 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		{
 			Vector3D transMissionDir = Utils::computeTransmissionDirection(r, normal, eta, cosThetaI, cosThetaT);
 			Ray rTrans = Ray(closestIntersection.itsPoint, transMissionDir.normalized(), r.depth + 1);
-			//rTrans.setMinTInPoint(closestIntersection.itsPoint);
 			return computeColor(rTrans, objList, lsList);
 		}
 		else 
