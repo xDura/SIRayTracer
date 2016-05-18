@@ -1,4 +1,5 @@
 #include "globalishader.h"
+#include "../samplers/hemisphericalsampler.h"
 
 GlobalIlumination::GlobalIlumination(Vector3D& bgColor_)
 	:Shader(bgColor_)
@@ -23,6 +24,7 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 	wo = (r.o - closestIntersection.itsPoint).normalized();
 	normal = closestIntersection.normal.normalized();
 
+	#pragma region PERFECT_SPECULAR
 	//specular mirror like reflections part
 	if (currentMat.hasSpecular())
 	{
@@ -34,7 +36,9 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		Ray rSpec = Ray(closestIntersection.itsPoint, perfSpecDir.normalized(), r.depth + 1);
 		return computeColor(rSpec, objList, lsList);
 	}
+#pragma endregion
 
+	#pragma region TRANSMISSION
 
 	if (currentMat.hasTransmission())
 	{
@@ -69,6 +73,9 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		}
 	}
 
+#pragma endregion
+
+	#pragma region DIRECT_ILUMINATION
 
 	for (int i = 0; i < lsList.size(); i++)
 	{
@@ -93,6 +100,11 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		finalColor += Utils::multiplyPerCanal(lightIntensity, contribution);
 
 	}
+	#pragma endregion
+
+	#pragma region INDIRECT_ILUMINATION
+	
+	#pragma endregion
 
 	return finalColor;
 }
