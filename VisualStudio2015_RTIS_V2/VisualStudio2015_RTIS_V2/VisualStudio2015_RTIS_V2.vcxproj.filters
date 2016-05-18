@@ -34,6 +34,9 @@
     <Filter Include="Archivos de código fuente\extra">
       <UniqueIdentifier>{354d40a8-5337-430d-aad9-18135ec43036}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de código fuente\samplers">
+      <UniqueIdentifier>{61db423d-f54d-4f72-84c7-9a4508a2fa09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -126,6 +129,9 @@
     <ClCompile Include="..\..\src\shaders\globalishader.cpp">
       <Filter>Archivos de código fuente\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\samplers\hemisphericalsampler.cpp">
+      <Filter>Archivos de código fuente\samplers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cameras\camera.h">
@@ -214,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\shaders\globalishader.h">
       <Filter>Archivos de código fuente\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\samplers\hemisphericalsampler.h">
+      <Filter>Archivos de código fuente\samplers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
