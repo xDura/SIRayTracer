@@ -12,6 +12,7 @@ public:
 	virtual bool hasTransmission() const;
 	virtual bool hasDiffuseOrGlossy() const;
 	virtual double getIndexOfRefraction() const;
+	virtual Vector3D getDiffuseCoefficient() const;
 
 	Vector3D kSpecular;
 	Vector3D kDiffuse;
