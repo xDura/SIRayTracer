@@ -221,7 +221,7 @@ bool Mesh::loadFromASE(const char* fileName)
 			float y = parser.getfloat();
 			float z = parser.getfloat();
 
-			normals[i] = Vector3D(x, z, -y);
+			normals[i] = Vector3D(x, z, y);
 		}
 		//*******				 **************
 

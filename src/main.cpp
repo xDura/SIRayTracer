@@ -18,6 +18,7 @@
 #include "shaders/intersectionshader.h"
 #include "shaders/DepthShader.h"
 #include "shaders/directishader.h"
+#include "shaders/globalishader.h"
 
 #include "materials/phong.h"
 #include "materials/mirror.h"
@@ -185,6 +186,21 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	objectsList->push_back(bottomPlan);
 	objectsList->push_back(backPlan);
 
+	Matrix4x4 meshTransform;
+	Matrix4x4 meshTranslation;
+	meshTransform = meshTransform.scale(Vector3D(0.1, 0.1, 0.1)); /** meshTransform.rotate(Utils::degreesToRadians(30), Vector3D(0.0, 1.0, 0.0));*/
+	Mesh *s4 = new Mesh(meshTransform, greenDiffuse);
+	s4->loadFromASE("spitfire_low.ASE");
+
+	/*s4->vertices.push_back(Vector3D(0.0f, 1.0f, 0.0f));
+	s4->vertices.push_back(Vector3D(1.0f, 0.0f, 0.0f));
+	s4->vertices.push_back(Vector3D(-1.0f, 0.0f, 0.0f));
+
+	s4->normals.push_back(Vector3D(0.0f, 0.0f, 1.0f));
+	s4->normals.push_back(Vector3D(1.0f, 0.0f, 0.0f));
+	s4->normals.push_back(Vector3D(1.0f, 1.0f, 0.0f));*/
+	objectsList->push_back((Shape*)s4);
+
 	// Place the Spheres inside the Cornell Box
 	Matrix4x4 sphereTransform1;
 	double radius = 1;
@@ -197,9 +213,9 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	radius = 1;
 	sphereTransform3 = Matrix4x4::translate(Vector3D(0.3, -offset + radius, 5));
 	Shape *s3 = new Sphere(radius, sphereTransform3, red_100);
-	objectsList->push_back(s1);
-	objectsList->push_back(s2);
-	objectsList->push_back(s3);
+	//objectsList->push_back(s1);
+	//objectsList->push_back(s2);
+	//objectsList->push_back(s3);
 
 	/* ****** */
 	/* Lights */
@@ -208,7 +224,7 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	Vector3D lightPosition1 = Vector3D(0, offset - 1, 2 * offset);
 	Vector3D lightPosition2 = Vector3D(0, offset - 1, 0);
 	Vector3D lightPosition3 = Vector3D(0, offset - 1, offset);
-	Vector3D intensity = Vector3D(10, 10, 10); // Radiant intensity (watts/sr)
+	Vector3D intensity = Vector3D(3, 3, 3); // Radiant intensity (watts/sr)
 	PointLightSource pointLS1(lightPosition1, intensity);
 	PointLightSource pointLS2(lightPosition2, intensity);
 	PointLightSource pointLS3(lightPosition3, intensity);
@@ -234,6 +250,7 @@ int main()
     //Shader *shader = new IntersectionShader (intersectionColor, bgColor);
 	//Shader* shader = new DepthShader(Vector3D(0.4, 1, 0.4), 8, bgColor);
 	Shader* shader = new DirectIlumination(bgColor);
+	//Shader* shader = new GlobalIlumination(bgColor, 50);
 
     // Declare pointers to all the variables which describe the scene
     Camera *cam;

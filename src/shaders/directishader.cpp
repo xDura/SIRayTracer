@@ -85,9 +85,10 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		//we set the maxT as the place of the light because 
 		//we want only oclusions that closer than the light
 
-		shadowRay.setMaxTInPoint(lightPos);
+		//COMENTING SHADOWS BECAUSE IT DOES NOT WORK WITH MESHES
+		/*shadowRay.setMaxTInPoint(lightPos);
 		if (Utils::hasIntersection(shadowRay, objList))
-			continue;
+			continue;*/
 
 		Vector3D contribution = currentMat.getReflectance(normal, wo, wi);
 		finalColor += Utils::multiplyPerCanal(lightIntensity, contribution);
