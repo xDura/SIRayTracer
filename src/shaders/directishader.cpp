@@ -90,9 +90,14 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		if (Utils::hasIntersection(shadowRay, objList))
 			continue;*/
 
-		Vector3D contribution = currentMat.getReflectance(normal, wo, wi);
+		Vector3D contribution;
+		contribution = currentMat.getReflectance(normal, wo, wi);
 		finalColor += Utils::multiplyPerCanal(lightIntensity, contribution);
 
+	}
+
+	if (closestIntersection.isTriangle) {
+		finalColor = Utils::multiplyPerCanal(finalColor, currentMat.getColor(closestIntersection));
 	}
 
 	return finalColor;

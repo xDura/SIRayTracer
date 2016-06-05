@@ -75,12 +75,17 @@ bool Mesh::rayIntersect(const Ray &ray, Intersection &its) const
 			closestIts = auxIts;
 			//get the interpolated normal
 			//and store it in the intersection
-			closestIts.normal = (normals[i] * auxIts.u) + (normals[i + 1] * auxIts.v) + (normals[i + 2] * (1.0 - auxIts.u - auxIts.v));
+			closestIts.normal = (normals[i+1] * auxIts.u) + (normals[i + 2] * auxIts.v) + (normals[i] * (1.0 - auxIts.u - auxIts.v));
 			closestIts.normal = objectToWorld.transformVector(closestIts.normal);
-			//closestIts.normal = normals[i];
+
+			Vector2D uv = (uvs[i+1] * auxIts.u) + (uvs[i+2] * auxIts.v) + (uvs[i] * (1.0 - auxIts.u - auxIts.v));
+			closestIts.u = uv.x;
+			closestIts.v = uv.y;
+
 			closestIts.shape = this;
 			//pass the its point to world cordinates
 			closestIts.itsPoint = objectToWorld.transformPoint(its.itsPoint);
+			closestIts.isTriangle = true;
 		}
 	}
 
@@ -183,32 +188,32 @@ bool Mesh::loadFromASE(const char* fileName)
 
 
 		//****		UVS PART		*******
-		//parser.seek("*MESH_NUMTVERTEX");
-		//int nTVerts = parser.getint();
-		//std::vector< Vector2D > auxTVerts;
-		//auxTVerts.resize(nTVerts);
-		//int tv;
-		//for (unsigned int i = 0; i < nTVerts; i++) {
-		//	parser.seek("*MESH_TVERT");
-		//	tv = parser.getint();
-		//	float u = parser.getfloat();
-		//	float v = parser.getfloat();
-		//	auxTVerts[tv] = Vector2D(u, v);
-		//}
+		parser.seek("*MESH_NUMTVERTEX");
+		int nTVerts = parser.getint();
+		std::vector< Vector2D > auxTVerts;
+		auxTVerts.resize(nTVerts);
+		int tv;
+		for (unsigned int i = 0; i < nTVerts; i++) {
+			parser.seek("*MESH_TVERT");
+			tv = parser.getint();
+			float u = parser.getfloat();
+			float v = parser.getfloat();
+			auxTVerts[tv] = Vector2D(u, v);
+		}
 
-		//parser.seek("*MESH_NUMTVFACES");
-		//int nTFaces = parser.getint();
-		//uvs.resize(nTFaces * 3);
-		//int tCounter = 0;
-		//for (unsigned int i = 0; i < nTFaces; i++) {
-		//	parser.seek("*MESH_TFACE");
-		//	parser.getint();
-		//	for (unsigned int j = 0; j < 3; j++) {
-		//		int index = parser.getint();
-		//		uvs[tCounter] = auxTVerts[index];
-		//		tCounter++;
-		//	}
-		//}
+		parser.seek("*MESH_NUMTVFACES");
+		int nTFaces = parser.getint();
+		uvs.resize(nTFaces * 3);
+		int tCounter = 0;
+		for (unsigned int i = 0; i < nTFaces; i++) {
+			parser.seek("*MESH_TFACE");
+			parser.getint();
+			for (unsigned int j = 0; j < 3; j++) {
+				int index = parser.getint();
+				uvs[tCounter] = auxTVerts[index];
+				tCounter++;
+			}
+		}
 		//*********			 ***********
 
 

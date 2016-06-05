@@ -24,6 +24,8 @@
 #include "materials/mirror.h"
 #include "materials/transmissive.h"
 
+#include "core/image.h"
+
 
 void buildSceneSphere(Camera* &cam, Film* &film,
                       std::vector<Shape*>* &objectsList,
@@ -187,18 +189,17 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	objectsList->push_back(backPlan);
 
 	Matrix4x4 meshTransform;
-	Matrix4x4 meshTranslation;
-	meshTransform = meshTransform.scale(Vector3D(0.1, 0.1, 0.1)); /** meshTransform.rotate(Utils::degreesToRadians(30), Vector3D(0.0, 1.0, 0.0));*/
-	Mesh *s4 = new Mesh(meshTransform, greenDiffuse);
-	s4->loadFromASE("spitfire_low.ASE");
+	Image* tex = new Image();
+	Material* textureMat = new Phong(Vector3D(0.8, 0.8, 0.8), Vector3D(0.2, 0.2, 0.2), 100);
+	textureMat->texture = tex;
+	tex->loadTGA("spitfire_axis_color_spec.tga");
+	//tex->loadTGA("agua.tga");
+	meshTransform = meshTransform.scale(Vector3D(0.3, 0.3, 0.3)); /** meshTransform.rotate(Utils::degreesToRadians(30), Vector3D(0.0, 1.0, 0.0));*/
+	meshTransform = meshTransform * meshTransform.rotate(Utils::degreesToRadians(130), Vector3D(0.0, 1.0, 0.0));
+	Mesh *s4 = new Mesh(meshTransform, textureMat);
+	s4->loadFromASE("spitfire.ASE");
+	//s4->loadFromASE("hemisphere.ASE");
 
-	/*s4->vertices.push_back(Vector3D(0.0f, 1.0f, 0.0f));
-	s4->vertices.push_back(Vector3D(1.0f, 0.0f, 0.0f));
-	s4->vertices.push_back(Vector3D(-1.0f, 0.0f, 0.0f));
-
-	s4->normals.push_back(Vector3D(0.0f, 0.0f, 1.0f));
-	s4->normals.push_back(Vector3D(1.0f, 0.0f, 0.0f));
-	s4->normals.push_back(Vector3D(1.0f, 1.0f, 0.0f));*/
 	objectsList->push_back((Shape*)s4);
 
 	// Place the Spheres inside the Cornell Box
@@ -224,7 +225,7 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	Vector3D lightPosition1 = Vector3D(0, offset - 1, 2 * offset);
 	Vector3D lightPosition2 = Vector3D(0, offset - 1, 0);
 	Vector3D lightPosition3 = Vector3D(0, offset - 1, offset);
-	Vector3D intensity = Vector3D(3, 3, 3); // Radiant intensity (watts/sr)
+	Vector3D intensity = Vector3D(8, 8, 8); // Radiant intensity (watts/sr)
 	PointLightSource pointLS1(lightPosition1, intensity);
 	PointLightSource pointLS2(lightPosition2, intensity);
 	PointLightSource pointLS3(lightPosition3, intensity);
