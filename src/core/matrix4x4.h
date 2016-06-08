@@ -38,6 +38,8 @@ struct Matrix4x4
     Vector3D transformPoint(const Vector3D &p) const;
     Ray      transformRay(const Ray &r) const;
 
+	Matrix4x4 translateLocal(float x, float y, float z);
+
     //Vector3D  multiplyNormal(const Vector3D  &n) const;
     std::string toString() const;
     bool inverse(Matrix4x4 &target) const;

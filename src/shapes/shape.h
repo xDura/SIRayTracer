@@ -23,9 +23,9 @@ public:
     // Return the material associated with the shape
     const Material& getMaterial() const;
 
+	Matrix4x4 objectToWorld;
+	Matrix4x4 worldToObject;
 protected:
-    Matrix4x4 objectToWorld;
-    Matrix4x4 worldToObject;
     Material *material;
 };
 

@@ -166,7 +166,17 @@ Ray Matrix4x4::transformRay(const Ray &r) const
     transformedRay.o = transformedOrigin;
     transformedRay.d = transformedDir;
 
+	transformedRay.maxT = r.maxT;
+	transformedRay.minT = r.minT;
+
     return transformedRay;
+}
+
+Matrix4x4 Matrix4x4::translateLocal(float x, float y, float z)
+{
+	Matrix4x4 T;
+	T.translate(Vector3D(x,y,z));
+	return T * *this;
 }
 
 //Normal Matrix4x4::operator*(const Normal &n) const

@@ -24,12 +24,17 @@ public:
     size_t getWidth() const;
     size_t getHeight() const;
     Vector3D getPixelValue(size_t w, size_t h) const;
+	Vector3D get3x3Average(size_t w, size_t h) const;
+	Vector3D getAverage(size_t w, size_t h, int size) const;
+	void applyAverageFilter(unsigned int iterations, int filterSize);
+	void averageWith(const Film& f);
 
     // Setters
     void setPixelValue(size_t w, size_t h, Vector3D &value);
 
     // Other functions
     int save();
+	int save(const std::string& s);
     void clearData();
 
 private:

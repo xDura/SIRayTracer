@@ -11,8 +11,8 @@ Ray::Ray(const Vector3D &ori, Vector3D &dir, size_t dep, double start,
 	//in cases of problems with the length we can add this
 	//for the moment I dont use it because this is computatinally slow
 	//as we construct a lot of rays
-	/*if (dir.length() != 1.0)
-		d = dir.normalized();*/
+	if (dir.length() != 1.0)
+		d = dir.normalized();
 }
 
 
@@ -32,7 +32,7 @@ void Ray::setMaxTInPoint(const Vector3D& p)
 
 void Ray::setMinTInPoint(const Vector3D& p)
 {
-	minT = ((p.y - o.y) / d.y) + 1.0;
+	minT = ((p.y - o.y) / d.y) + Epsilon;
 }
 
 std::ostream &operator<<(std::ostream &out, const Ray &r)

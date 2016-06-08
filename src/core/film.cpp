@@ -41,6 +41,67 @@ size_t Film::getHeight() const
     return height;
 }
 
+Vector3D Film::get3x3Average(size_t w, size_t h) const
+{
+	Vector3D sum;
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			sum = sum + getPixelValue(w + i, h + j);
+		}
+	}
+
+	return sum / 9;
+}
+
+Vector3D Film::getAverage(size_t w, size_t h, int size) const
+{
+	Vector3D sum;
+	//as the division is within integers the result is floor of the
+	//division that is what we want
+	int delta = (size / 2);
+	for (int i = -delta; i < delta; i++)
+	{
+		for (int j = -delta; j < delta; j++)
+		{
+			sum = sum + getPixelValue(w + i, h + j);
+		}
+	}
+
+	return sum / (size * size);
+}
+
+void Film::applyAverageFilter(unsigned int iterations, int filterSize)
+{
+	Film auxFilm(width, height);
+	Vector3D average;
+	bool swap = true;
+	int delta = (filterSize / 2);
+
+	for (int iter = 0; iter < iterations; iter++)
+	{
+		for (int lin = delta; lin < width - delta; lin++)
+		{
+			for (int col = delta; col < height - delta; col++)
+			{
+				if (swap)
+				{
+					average = get3x3Average(col, lin);
+					auxFilm.setPixelValue(col, lin, average);
+				}
+				else
+				{
+					average = auxFilm.get3x3Average(col, lin);
+					setPixelValue(col, lin, average);
+				}
+			}
+		}
+
+		swap = !swap;
+	}
+}
+
 Vector3D Film::getPixelValue(size_t w, size_t h) const
 {
     return data[h][w];
@@ -67,4 +128,22 @@ void Film::clearData()
 int Film::save()
 {
     return BitMap::save(data, width, height);
+}
+
+void Film::averageWith(const Film& f)
+{
+	for (size_t h = 0; h<height; h++)
+	{
+		for (size_t w = 0; w<width; w++)
+		{
+			Vector3D currentPixel = getPixelValue(w, h);
+			Vector3D otherPixel = f.getPixelValue(w, h);
+			setPixelValue(w, h, (currentPixel + otherPixel));
+		}
+	}
+}
+
+int Film::save(const std::string& s)
+{
+	return BitMap::save(data, width, height, s);
 }

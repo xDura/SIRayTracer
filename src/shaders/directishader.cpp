@@ -69,7 +69,6 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		}
 	}
 
-
 	for (int i = 0; i < lsList.size(); i++) 
 	{
 		PointLightSource pl = lsList[i];
@@ -86,9 +85,10 @@ Vector3D DirectIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 		//we want only oclusions that closer than the light
 
 		//COMENTING SHADOWS BECAUSE IT DOES NOT WORK WITH MESHES
-		/*shadowRay.setMaxTInPoint(lightPos);
-		if (Utils::hasIntersection(shadowRay, objList))
-			continue;*/
+		shadowRay.setMaxTInPoint(lightPos);
+		//shadowRay.setMinTInPoint(closestIntersection.itsPoint);
+		if (Utils::hasIntersection(shadowRay, objList, closestIntersection.shape))
+			continue;
 
 		Vector3D contribution;
 		contribution = currentMat.getReflectance(normal, wo, wi);

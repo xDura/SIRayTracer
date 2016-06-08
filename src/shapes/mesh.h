@@ -13,6 +13,7 @@ public:
 	bool loadFromASE(const char* fileName);
 	void setMaterial(Material* m) { material = m; }
 	void computeAABB();
+	void translateLocal(float x, float y, float z);
 
 	std::vector<Vector3D> vertices;
 	std::vector<Vector3D> normals;

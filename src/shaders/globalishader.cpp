@@ -99,6 +99,7 @@ Vector3D GlobalIlumination::computeColor(const Ray &r, const std::vector<Shape*>
 			//we want only oclusions that closer than the light
 
 			shadowRay.setMaxTInPoint(lightPos);
+			//shadowRay.setMinTInPoint(closestIntersection.itsPoint);
 			if (Utils::hasIntersection(shadowRay, objList))
 				continue;
 

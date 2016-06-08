@@ -41,6 +41,7 @@ public:
 	//ray box intersection for fast rejections in mesh intersections
 	static bool intersectBB(Ray r, const Vector3D& min, const Vector3D& max);
 
+	static bool hasIntersection(const Ray &ray, const std::vector<Shape*> &objectsList, const Shape* obj);
 };
 
 #endif // UTILS_H

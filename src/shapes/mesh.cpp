@@ -56,6 +56,10 @@ bool Mesh::rayIntersect(const Ray &ray, Intersection &its) const
 
 	Ray r = worldToObject.transformRay(ray);
 
+	//reject if the ray does not intersect the bounding box
+	if (!Utils::intersectBB(r, min, max))
+		return false;
+
 	float closestDist = INFINITY;
 	Intersection auxIts;
 	Intersection closestIts;
@@ -84,7 +88,7 @@ bool Mesh::rayIntersect(const Ray &ray, Intersection &its) const
 
 			closestIts.shape = this;
 			//pass the its point to world cordinates
-			closestIts.itsPoint = objectToWorld.transformPoint(its.itsPoint);
+			closestIts.itsPoint = objectToWorld.transformPoint(auxIts.itsPoint);
 			closestIts.isTriangle = true;
 		}
 	}
@@ -270,4 +274,16 @@ void Mesh::computeAABB()
 
 	this->max = aux_max;
 	this->min = aux_min;
+}
+
+void Mesh::translateLocal(float x, float y, float z)
+{
+	Matrix4x4 T;
+	T = T.translate(Vector3D(x, y, z));
+	/*Matrix4x4 T;
+	T.translate(Vector3D(x, y, z));
+	return T * *this;*/
+	//objectToWorld = objectToWorld.translateLocal(x, y, z);
+	objectToWorld = objectToWorld * T;
+	objectToWorld.inverse(worldToObject);
 }

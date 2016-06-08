@@ -29,6 +29,23 @@ bool Utils::hasIntersection(const Ray &ray, const std::vector<Shape*> &objectsLi
     return false;
 }
 
+bool Utils::hasIntersection(const Ray &ray, const std::vector<Shape*> &objectsList, const Shape* me)
+{
+	// For each object on the scene...
+	for (size_t objIndex = 0; objIndex < objectsList.size(); objIndex++)
+	{
+		// Get the current object
+		const Shape *obj = objectsList.at(objIndex);
+		if (obj == me) continue;
+
+		Intersection i;
+		if (obj->rayIntersect(ray, i))
+			return true;
+	}
+
+	return false;
+}
+
 Vector3D Utils::reflect(const Vector3D& n, const Vector3D& i)
 {
 	//Vector3D reflectedDir = 2 * std::max(0.0f, (float)dot(n, v
@@ -170,6 +187,8 @@ bool Utils::intersect(Ray r, const Vector3D& v0, const Vector3D& v1, const Vecto
 	//fill the info in the intersection
 	inter.isTriangle = true;
 	t = dot(v0v2, qvec) * invDet;
+	//if (t > r.maxT || /*t < r.minT*/) return false;
+
 	inter.itsPoint = r.o + r.d.normalized() * t;
 	return true;
 }

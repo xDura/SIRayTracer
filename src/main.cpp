@@ -138,6 +138,8 @@ void raytrace(Camera* &cam, Shader* &shader, Film* &film,
 
             // Generate the camera ray
             Ray cameraRay = cam->generateRay(x, y);
+			cameraRay.maxT = INFINITY;
+			cameraRay.minT = 0;
 
             // Compute ray color according to the used shader
             Vector3D pixelColor = shader->computeColor( cameraRay, *objectsList, *lightSourceList );
@@ -148,13 +150,70 @@ void raytrace(Camera* &cam, Shader* &shader, Film* &film,
     }
 }
 
+void raytraceWithMotionBlur(Camera* &cam, Shader* &shader, Film* &film,
+	std::vector<Shape*>* &objectsList, std::vector<PointLightSource>* &lightSourceList)
+{
+
+	std::string separator = "\n----------------------------------------------\n";
+	std::string separatorStar = "\n**********************************************\n";
+	std::cout << separator << "RTIS - Motion Blurr example \"Imatge Sintetica\"" << separator << std::endl;
+	unsigned int sizeBar = 40;
+
+	size_t resX = film->getWidth();
+	size_t resY = film->getHeight();
+
+	Film* auxFilm;
+	auxFilm = new Film(film->getWidth(), film->getHeight());
+
+	int timesToMove = 3;
+	for (int i = 0; i < timesToMove; i++) {
+		// Main raytracing loop
+		// Out-most loop invariant: we have rendered lin lines
+		for (size_t lin = 0; lin < resY; lin++)
+		{
+			// Show progression
+			if (lin % (resY / sizeBar) == 0)
+				std::cout << ".";
+
+			// Inner loop invariant: we have rendered col columns
+			for (size_t col = 0; col < resX; col++)
+			{
+				// Compute the pixel position in NDC
+				double x = (double)(col + 0.5) / resX;
+				double y = (double)(lin + 0.5) / resY;
+
+				// Generate the camera ray
+				Ray cameraRay = cam->generateRay(x, y);
+				cameraRay.maxT = INFINITY;
+
+				// Compute ray color according to the used shader
+				Vector3D pixelColor = shader->computeColor(cameraRay, *objectsList, *lightSourceList);
+
+				// Store the pixel color
+				auxFilm->setPixelValue(col, lin, pixelColor);
+			}
+		}
+
+		Mesh* m = (Mesh*)objectsList->at(0);
+		if(i < timesToMove - 1)
+			auxFilm->applyAverageFilter(20,3);
+
+		film->averageWith(*auxFilm);
+		m->translateLocal(0.0, 0.0, 5.0);
+		std::cout << std::endl;
+		std::stringstream ss;
+		ss << "./" << i << ".bmp";
+		auxFilm->save(ss.str());
+	}
+}
+
 void buildSceneCornellBox(Camera* &cam, Film* &film,
 	std::vector<Shape*>* &objectsList, std::vector<PointLightSource>* &lightSourceList)
 {
 	/* **************************** */
 	/* Declare and place the camera */
 	/* **************************** */
-	Matrix4x4 cameraToWorld = Matrix4x4::translate(Vector3D(0, 0, -3));
+	Matrix4x4 cameraToWorld = Matrix4x4::translate(Vector3D(0, 0, -2));
 	double fovDegrees = 60;
 	double fovRadians = Utils::degreesToRadians(fovDegrees);
 	cam = new PerspectiveCamera(cameraToWorld, fovRadians, *film);
@@ -188,20 +247,6 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	objectsList->push_back(bottomPlan);
 	objectsList->push_back(backPlan);
 
-	Matrix4x4 meshTransform;
-	Image* tex = new Image();
-	Material* textureMat = new Phong(Vector3D(0.8, 0.8, 0.8), Vector3D(0.2, 0.2, 0.2), 100);
-	textureMat->texture = tex;
-	tex->loadTGA("spitfire_axis_color_spec.tga");
-	//tex->loadTGA("agua.tga");
-	meshTransform = meshTransform.scale(Vector3D(0.3, 0.3, 0.3)); /** meshTransform.rotate(Utils::degreesToRadians(30), Vector3D(0.0, 1.0, 0.0));*/
-	meshTransform = meshTransform * meshTransform.rotate(Utils::degreesToRadians(130), Vector3D(0.0, 1.0, 0.0));
-	Mesh *s4 = new Mesh(meshTransform, textureMat);
-	s4->loadFromASE("spitfire.ASE");
-	//s4->loadFromASE("hemisphere.ASE");
-
-	objectsList->push_back((Shape*)s4);
-
 	// Place the Spheres inside the Cornell Box
 	Matrix4x4 sphereTransform1;
 	double radius = 1;
@@ -214,9 +259,9 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	radius = 1;
 	sphereTransform3 = Matrix4x4::translate(Vector3D(0.3, -offset + radius, 5));
 	Shape *s3 = new Sphere(radius, sphereTransform3, red_100);
-	//objectsList->push_back(s1);
-	//objectsList->push_back(s2);
-	//objectsList->push_back(s3);
+	objectsList->push_back(s1);
+	objectsList->push_back(s2);
+	objectsList->push_back(s3);
 
 	/* ****** */
 	/* Lights */
@@ -233,6 +278,55 @@ void buildSceneCornellBox(Camera* &cam, Film* &film,
 	lightSourceList->push_back(pointLS2);
 	lightSourceList->push_back(pointLS3);
 }
+
+void buildPlaneScene(Camera* &cam, Film* &film,
+	std::vector<Shape*>* &objectsList, std::vector<PointLightSource>* &lightSourceList)
+{
+	/* **************************** */
+	/* Declare and place the camera */
+	/* **************************** */
+	Matrix4x4 cameraToWorld = Matrix4x4::translate(Vector3D(0, 0, -2));
+	double fovDegrees = 60;
+	double fovRadians = Utils::degreesToRadians(fovDegrees);
+	cam = new PerspectiveCamera(cameraToWorld, fovRadians, *film);
+
+	/* ******* */
+	/* Objects */
+	/* ******* */
+	objectsList = new std::vector<Shape*>;
+	double offset = 3.0;
+	Matrix4x4 idTransform;
+
+	Matrix4x4 meshTransform;
+	Image* tex = new Image();
+	Material* textureMat = new Phong(Vector3D(0.8, 0.8, 0.8), Vector3D(0.2, 0.2, 0.2), 100);
+	textureMat->texture = tex;
+	tex->loadTGA("spitfire_axis_color_spec.tga");
+	//tex->loadTGA("agua.tga");
+	meshTransform = meshTransform.scale(Vector3D(0.2, 0.2, 0.2)); /** meshTransform.rotate(Utils::degreesToRadians(30), Vector3D(0.0, 1.0, 0.0));*/
+	meshTransform = meshTransform * meshTransform.rotate(Utils::degreesToRadians(130), Vector3D(0.0, 1.0, 0.0));
+	//meshTransform = meshTransform * meshTransform.translate(Vector3D(0.0, 0.0, 5.0));
+	Mesh *s4 = new Mesh(meshTransform, textureMat);
+	s4->loadFromASE("spitfire.ASE");
+	s4->translateLocal(0.0, 0.0, -9);
+	//s4->loadFromASE("hemisphere.ASE");
+
+	objectsList->push_back((Shape*)s4);
+
+	lightSourceList = new std::vector<PointLightSource>;
+	Vector3D lightPosition1 = Vector3D(0, offset - 1, 2 * offset);
+	Vector3D lightPosition2 = Vector3D(0, offset - 1, 0);
+	Vector3D lightPosition3 = Vector3D(0, offset - 1, offset);
+	Vector3D intensity = Vector3D(8, 8, 8); // Radiant intensity (watts/sr)
+	PointLightSource pointLS1(lightPosition1, intensity);
+	PointLightSource pointLS2(lightPosition2, intensity);
+	PointLightSource pointLS3(lightPosition3, intensity);
+	lightSourceList->push_back(pointLS1);
+	lightSourceList->push_back(pointLS2);
+	lightSourceList->push_back(pointLS3);
+}
+
+
 
 int main()
 {
@@ -260,10 +354,12 @@ int main()
 
     // Build the scene
     //buildSceneSphere(cam, film, objectsList, lightSourceList);
-	buildSceneCornellBox(cam, film, objectsList, lightSourceList);
+	//buildSceneCornellBox(cam, film, objectsList, lightSourceList);
+	buildPlaneScene(cam, film, objectsList, lightSourceList);
 
     // Launch some rays!
-    raytrace(cam, shader, film, objectsList, lightSourceList);
+    //raytrace(cam, shader, film, objectsList, lightSourceList);
+	raytraceWithMotionBlur(cam, shader, film, objectsList, lightSourceList);
 
     // Save the final result to file
     std::cout << "\n\nSaving the result to file output.bmp\n" << std::endl;
